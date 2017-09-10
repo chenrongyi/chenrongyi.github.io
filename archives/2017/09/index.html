@@ -117,15 +117,15 @@
     
     
         <article class="index-post">
-            <a class="content-show-full" href = "/2017/08/20/写在前面/" >
+            <a class="content-show-full" href = "/2017/09/10/用预渲染加速显示iOS图片/" >
                 <div class="abstract-post-title">
                     <h2 class="abstract-title">
                         
-                        <span>写在最前面的话</span>
+                        <span>用预渲染加速显示iOS图片</span>
                     </h2>
                 </div>
                 <div class="abstract-content">
-                    毕业已经一年了，做为一名iOS的开发人员也已经有两年的时间，一路跌跌撞撞的在前进着，这一路上有过想放弃的冲动，有过彷徨无助，有过快乐与兴奋的成就。感谢这一路上的许多大牛对我的指导，也感谢身边有一群伙伴一路陪着我前进着！自毕业以来，整个人懒散不少，很少花大量的时间在技术研究上面，多数时候有了想法也没马上去实现，除了靠着时间积累了不少项目经验外，对自己的要求开始有所放松，很多东西开始信奉“拿来主义”，只追求功能的实现，很少去考虑为什么，还能有什么其他更好的解决办法没有,没有了刚开始学习iOS时候的热情和态度了。这段时间，对自己的过去进行总结，在几个伙伴的鼓励下，开始摒弃这种拿来主义的行为，并...
+                    &nbsp;&nbsp;在做UITableView性能优化的路上，一定绕不开一个点，就是渲染的问题。在使用中，我们会发现，UITableView第一次显示的图像不如再次显示的图像流畅，出现前会有稍许的停顿感。在显示图像时，解压和重采样会消耗很多CPU时间，预渲染图像，在bitmap context先将其画一遍，导出成UIImage对象，然后再绘制到屏幕，这会大大提高渲染速度。 &nbsp;&nbsp;屏幕的显示成像是结合了CPU数据处理和GPU渲染而来的，即每次垂直同步信号过来屏幕刷新时都会受到CPU和GPU的影响。CPU 计算显示内容（视图的创建、布局计算、图片解码、文本绘制等），完成...
                 </div>
             </a>
             <div class="abstract-post-meta">
@@ -133,35 +133,7 @@
                 
                 <!-- date  -->
                 <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/08/20</span>
-                </div>
-            </div>
-        </article>
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/08/20/hello-world/" >
-                <div class="abstract-post-title">
-                    <h2 class="abstract-title">
-                        
-                        <span>Hello World</span>
-                    </h2>
-                </div>
-                <div class="abstract-content">
-                    Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post1$ hexo new "My New Post"
-More info: Writing
-Run server1$ hexo server
-More...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/08/20</span>
+                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/10</span>
                 </div>
             </div>
         </article>

@@ -122,6 +122,30 @@
     
     
         <article class="index-post">
+            <a class="content-show-full" href = "/2017/09/10/用预渲染加速显示iOS图片/" >
+                <div class="abstract-post-title">
+                    <h2 class="abstract-title">
+                        
+                        <span>用预渲染加速显示iOS图片</span>
+                    </h2>
+                </div>
+                <div class="abstract-content">
+                    &nbsp;&nbsp;在做UITableView性能优化的路上，一定绕不开一个点，就是渲染的问题。在使用中，我们会发现，UITableView第一次显示的图像不如再次显示的图像流畅，出现前会有稍许的停顿感。在显示图像时，解压和重采样会消耗很多CPU时间，预渲染图像，在bitmap context先将其画一遍，导出成UIImage对象，然后再绘制到屏幕，这会大大提高渲染速度。 &nbsp;&nbsp;屏幕的显示成像是结合了CPU数据处理和GPU渲染而来的，即每次垂直同步信号过来屏幕刷新时都会受到CPU和GPU的影响。CPU 计算显示内容（视图的创建、布局计算、图片解码、文本绘制等），完成...
+                </div>
+            </a>
+            <div class="abstract-post-meta">
+                <!-- tags  -->
+                
+                <!-- date  -->
+                <div class="abstract-date">
+                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/10</span>
+                </div>
+            </div>
+        </article>
+    
+    
+    
+        <article class="index-post">
             <a class="content-show-full" href = "/2017/08/20/写在前面/" >
                 <div class="abstract-post-title">
                     <h2 class="abstract-title">
@@ -292,7 +316,16 @@ More...
     
     
     
-    <div class="total-archive"> Total : 2 </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 3 </div>
     
     <div class="post-archive">
     
@@ -301,6 +334,11 @@ More...
     
     <div class="archive-year"> 2017 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/10</span><a class="archive-post-title" href= "/2017/09/10/用预渲染加速显示iOS图片/" >用预渲染加速显示iOS图片</a>
+        </li>
     
     
         <li class="archive-post-item">

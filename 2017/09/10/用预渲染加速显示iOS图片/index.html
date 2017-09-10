@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
     <title>
         
-        Hello World · ChenEZ的峥嵘岁月.
+        用预渲染加速显示iOS图片 · ChenEZ的峥嵘岁月.
         
     </title>
     <link rel="icon" href= /assests/favicon.ico>
@@ -82,7 +82,7 @@
                 <a href="/" >ChenEZ的峥嵘岁月.</a>
             </div>
             <div class="post-banner">
-                <span class="post-name">Hello World</span>
+                <span class="post-name">用预渲染加速显示iOS图片</span>
             </div>
         </div>
     </div>
@@ -106,7 +106,7 @@
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            Hello World
+            用预渲染加速显示iOS图片
             <!-- 404 -->
             
         </h1>
@@ -124,12 +124,12 @@
             
             <div class="post-intro-meta">
                 <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                <span class="post-intro-time">2017/08/20</span>
+                <span class="post-intro-time">2017/09/10</span>
             </div>
             <!-- 
 
 <div class="post-share iconfont-archer">
-    <ul class="share-box" data-href = "/2017/08/20/hello-world/" data-title = "Hello World" >
+    <ul class="share-box" data-href = "/2017/09/10/用预渲染加速显示iOS图片/" data-title = "用预渲染加速显示iOS图片" >
         <li class="to-weibo">分享到微博</li>
         <li class="to-wechat">分享到微信</li>
         <li class="to-qq">分享到QQ</li>
@@ -147,27 +147,56 @@
     <div class="QRcode-close">×</div>
 </div>
     <article class="article-entry">
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+        <p>&nbsp;&nbsp;在做UITableView性能优化的路上，一定绕不开一个点，就是渲染的问题。在使用中，我们会发现，UITableView第一次显示的图像不如再次显示的图像流畅，出现前会有稍许的停顿感。在显示图像时，解压和重采样会消耗很多CPU时间，预渲染图像，在bitmap context先将其画一遍，导出成UIImage对象，然后再绘制到屏幕，这会大大提高渲染速度。<br> &nbsp;&nbsp;屏幕的显示成像是结合了CPU数据处理和GPU渲染而来的，即每次垂直同步信号过来屏幕刷新时都会受到CPU和GPU的影响。CPU 计算显示内容（视图的创建、布局计算、图片解码、文本绘制等），完成后将计算好的内容提交到GPU，由 GPU 进行变换、合成、渲染。随后 GPU 会把渲染结果提交到帧缓冲区去，等待下一次垂直同步信号到来时显示到屏幕上。iOS中系统图形服务通过 CADisplayLink 等机制通知 App，App 在主线程开始上述操作。如果在一个刷新时间内，CPU 或者 GPU 没有完成内容提交，则那一帧就会被丢弃，等待下一次机会再显示，而这时显示屏会保留之前的内容不变，从而产生掉帧情况，从而导致界面卡顿。<br> &nbsp;&nbsp;由此，我们就了解了，iOS成像卡顿是由CPU和GPU的不合理处理导致的，对于图像问题，有针对的分析就可以解决了。<br>weaken大神在专门写过一篇博客，详细介绍了如何利用预渲染加速图像的显示，我就不班门弄斧，直接用大神的代码来介绍下了；</p>
+<blockquote>
+<p>//  ImageView.h<br>#import <uikit uikit.h=""><br>@interface ImageView : UIView {<br>    UIImage *image;<br>}</uikit></p>
+<p>@property (retain, nonatomic) UIImage *image;</p>
+<p>@end</p>
+<p>//  ImageView.m</p>
+<p>#include <mach mach_time.h=""><br>#import “ImageView.h”</mach></p>
+<p>@implementation ImageView</p>
+<p>#define LABEL_TAG 1</p>
+<p>static const CGRect imageRect = {0,0,100,100};<br>static const CGPoint imagePoint = {0, 0};</p>
+<p>@synthesize image;</p>
+<p>- (void)awakeFromNib {<br>       if (!self.image) {<br>             self.image = [UIImage imageNamed:@”random.jpg”];<br>       }<br>}</p>
+<p>- (void)drawRect:(CGRect)rect {<br>      if (CGRectEqualToRect(rect, imageRect)) {<br>             uint64_t start = mach_absolute_time();<br>             [image drawAtPoint:imagePoint];<br>             uint64_t drawTime = mach_absolute_time() - start;</p>
+<p>         NSString <em>text = [[NSString alloc] initWithFormat:@”%lld”, drawTime];<br>             UILabel </em>label = (UILabel *)[self viewWithTag:LABEL_TAG];<br>             label.text = text;<br>             [text release];<br>       }<br>}</p>
+<p>- (void)dealloc {<br>         [super dealloc];<br>        [image release];<br>}</p>
+<p>@end</p>
+</blockquote>
+<p>&nbsp;&nbsp;控制器的代码我就不列出了，就是点按钮时，更新view（调用<code>[self.view setNeedsDisplayInRect:imageRect]</code>），画出一张图，并在label中显示消耗的时间。值得一提的是，在模拟器上可以直接用clock()函数获得微秒级的精度，但iOS设备上精度为10毫秒。于是我找到了<code>mach_absolute_time()</code>，它在Mac和iOS设备上都有纳秒级的精度。<br>测试用的是一张200x200像素的JPEG图像，命名时加了@2x，在iPhone 4上第一次显示时花了约300微秒，再次显示约65微秒。</p>
+<p>  接下来就是见证奇迹的时刻了，把这段代码加入程序：</p>
+<blockquote>
+<p>static const CGSize imageSize = {100, 100};</p>
+<p>- (void)awakeFromNib {<br>      if (!self.image) {<br>          self.image = [UIImage imageNamed:@”random.jpg”];<br>         if (NULL != UIGraphicsBeginImageContextWithOptions)<br>           UIGraphicsBeginImageContextWithOptions(imageSize, YES, &gt;0);<br>           else<br>             UIGraphicsBeginImageContext(imageSize);<br>           [image drawInRect:imageRect];<br>           self.image = UIGraphicsGetImageFromCurrentImageContext();<br>          UIGraphicsEndImageContext();<br>     }<br>}</p>
+</blockquote>
+<p>这里需要判断一下<code>UIGraphicsBeginImageContextWithOptions</code>是否为NULL，因为它是iOS 4.0才加入的。<br>由于JPEG图像是不透明的，所以第二个参数就设为YES。<br>第三个参数是缩放比例，iPhone 4是2.0，其他是1.0。虽然这里可以用<code>[UIScreen mainScreen].scale</code>来获取，但实际上设为0后，系统就会自动设置正确的比例了。<br>值得一提的是，图像本身也有缩放比例，普通的图像是1.0（除了UIImage imageNamed:外，大部分API都只能获得这种图像，而且缩放比例是不可更改的），高清图像是2.0。图像的点和屏幕的像素就是依靠2者的缩放比例来计算的，例如普通图像在视网膜显示屏上是1:4，而高清图像在视网膜显示屏上则是1:1。</p>
+<p>接下来的drawInRect:把图像画到了当前的image context里，这时就完成了解压缩和重采样的工作了。然后再从image context里获取新的image，这个image的缩放比例也能正确地和设备匹配。</p>
+<p>再点下按钮，发现时间已经缩短到12微秒左右了，之后的画图稳定在15微秒左右。</p>
+<p>还能更快吗？让我们来试试Core Graphics。<br>先定义一个全局的CGImageRef变量：<br><code>static CGImageRef imageRef;</code><br>再在awakeFromNib中设置一下它的值：<br><code>imageRef = self.image.CGImage;</code><br>最后在drawRect:中绘制：</p>
+<blockquote>
+<p>CGContextRef context = UIGraphicsGetCurrentContext();<br>CGContextDrawImage(context, imageRect, imageRef);</p>
+</blockquote>
+<p>搞定运行一下，发现时间增加到33微秒左右了，而且图像还上下颠倒了⋯<br>这个原因是UIKit和Core Graphics的坐标系y轴是相反的，于是加上2行代码来修正：</p>
+<blockquote>
+<p>CGContextRef context = UIGraphicsGetCurrentContext();<br>CGContextTranslateCTM(context, 0, 100);<br>CGContextScaleCTM(context, 1, -1);<br>CGContextDrawImage(context, imageRect, imageRef);</p>
+</blockquote>
+<p>这下图像终于正常显示了，时间缩短到了14微秒左右，成效不大，看来直接用-drawAtPoint:和-drawInRect:也足够好了。</p>
+<p>当然，这个例子正确的做法是用viewDidLoad或loadView，不过我懒得列出控制器代码，所以就放awakeFromNib里了。</p>
+<p><strong>勘误</strong><br>刚看到Mach Absolute Time Units这篇Q&amp;A，发现mach_absolute_time()的单位是Mach absolute time unit，而不是纳秒。它们之间的换算关系和CPU相关，不是一个常量。<br>最简单的办法是用CoreServices框架的AbsoluteToNanoseconds和AbsoluteToDuration函数来转换。此外也可以用mach_timebase_info函数来获取这个比值。<br>我在iPhone 4上测得的numer和denom分别为125和3，比值约为42，因此本文所述的时间都需要乘以42。</p>
+<p><strong>参考</strong><br>keakon涂鸦馆：<a href="https://www.keakon.net/2011/07/26/利用预渲染加速iOS设备的图像显示" target="_blank" rel="external">利用预渲染加速iOS设备的图像显示</a></p>
 
     </article>
     <!-- 前后页  -->
     <ul class="post-pager">
         
-            <li class="previous">
+        
+            <li class="next">
                 <a href= "/2017/08/20/写在前面/" title= 写在最前面的话 >
-                    <span>Previous Post</span>
+                    <span>Next Post</span>
                     <span>写在最前面的话</span>
                 </a>
             </li>
-        
         
     </ul>
     <!-- 来必力City版安装代码 -->
