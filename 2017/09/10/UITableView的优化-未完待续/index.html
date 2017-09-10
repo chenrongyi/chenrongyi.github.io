@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
     <title>
         
-        ChenEZ的峥嵘岁月.
+        UITableView的优化(未完待续) · ChenEZ的峥嵘岁月.
         
     </title>
     <link rel="icon" href= /assests/favicon.ico>
@@ -68,7 +68,7 @@
     
 </head>
     
-        <body class="four-zero-four-body">
+        <body class="post-body">
     
     
 <header class="header">
@@ -76,8 +76,20 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+        <div class="toggle-banner">
+            <div class="blog-title">
+                <a href="/" >ChenEZ的峥嵘岁月.</a>
+            </div>
+            <div class="post-banner">
+                <span class="post-name">UITableView的优化(未完待续)</span>
+            </div>
+        </div>
+    </div>
+    
     <a class="home-link" href=/>ChenEZ的峥嵘岁月.</a>
 </header>
+    
     
     <div class="wrapper">
         <div class="site-intro">
@@ -85,139 +97,91 @@
     <!-- 主页  -->
     
     
+    <!-- 404页  -->
     
-    <div class="site-intro-img" style="background-image: url(http://oumn0o088.bkt.clouddn.com/404.jpg)"></div>
+    <div class="site-intro-img" style="background-image: url(http://oumn0o088.bkt.clouddn.com/post-bg.jpg)"></div>
     <div class="site-intro-placeholder"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            [404]
+            UITableView的优化(未完待续)
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
-            <p class="intro-subtitle"> </p>
+            
+        </p>
+        <!-- 404 -->
         
         <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/09/10</span>
+            </div>
+            <!-- 
+
+<div class="post-share iconfont-archer">
+    <ul class="share-box" data-href = "/2017/09/10/UITableView的优化-未完待续/" data-title = "UITableView的优化(未完待续)" >
+        <li class="to-weibo">分享到微博</li>
+        <li class="to-wechat">分享到微信</li>
+        <li class="to-qq">分享到QQ</li>
+        <li class="to-twitter">分享到twitter</li>
+    </ul>
+</div> -->
         
     </div>
 </div>
         <div class="container">
-            <main class="main index-page">
+            <main class="main post-page">
     <div class="qr-mask"></div>
 <div class="QRcode-box">
     <p>扫描二维码分享</p>
     <div class="QRcode-close">×</div>
 </div>
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/09/10/UITableView的优化-未完待续/" >
-                <div class="abstract-post-title">
-                    <h2 class="abstract-title">
-                        
-                        <span>UITableView的优化(未完待续)</span>
-                    </h2>
-                </div>
-                <div class="abstract-content">
-                    ####1. 重用
+    <article class="article-entry">
+        <p>####1. 重用</p>
+<blockquote>
+<p>-(UITableViewCell <em>)tableView:(UITableView </em>)tableView cellForRowAtIndexPath:(NSIndexPath <em>)indexPath{<br>   static NSString </em>Identifier = @”cell”;<br>  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: Identifier];<br>   if (!cell) {<br>     cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier: Identifier];<br>    }<br>   return cell;<br>}</p>
+</blockquote>
+<p>这是常见的也是最简单的Cell复用。我们都是在cellForRowAtIndexPath：的方法中为每个Cell绑定数据，实际上在这个时候Cell还没被显示出来，为了提高效率，我们可以在Cell显示出来在进行绑定数据。<br><code>- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath</code><br>willDisplayCell:在Cell 在tableview展示之前就会调用，此时cell实例已经生成，所以不能更改cell的结构，只能是改动cell上的UI的一些属性（例如label的内容等）。</p>
+<p>##2. Cell高度的计算<br> 一般来说，我们队Cell的高度有两种计算方法，一种是定高，一种是动态计算高度。<br>定高的Cell，我们一般通过<br><code>self.tableView.rowHeight = 80.0;</code><br>动态计算Cell高度的，通过实现代理来计算<br><code>-(CGFloat)tableView:(UITableView
+*)tableViewheightForRowAtIndexPath:(NSIndexPath
+*)indexPath</code><br>为什么说Cell的高度计算会影响UITableView的性能呢？这跟UITableView的的回调顺序有很大的关系。UITableView的回调顺序是先多次调用<code>tableView:heightForRowAtIndexPath:</code>用来确定 contentSize 及  Cell 的位置，然后才会调用 <code>tableView:cellForRowAtIndexPath:</code>,从而来显示在当前屏幕的 cell 。<br>iOS8会更厉害，还会边滑动边调用 <code>tableView:heightForRowAtIndexPath:</code> 可见这个方法里一定不能重复进行着大量的计算。我们应该提前计算好 cell 的高度并且缓存起来，在回调时直接把高度值直接返回。一般在网络请求结束后，在更新界面之前就把每个 cell 的高度算好，缓存到相对应的 model 中。</p>
+<p>##3. 渲染<br> 对UITableView的体验要求，最核心的就是要滑动流畅。为了保证滑动流畅，Cell的渲染速度必须快。<br>（1）当有图像时，预渲染图像，在bitmap context先将其画一遍，导出成UIImage对象，然后再绘制到屏幕，这会大大提高渲染速度。具体内容可以看我的另一篇文章：<a href="http://chenez.cn/2017/09/10/用预渲染加速显示iOS图片/" target="_blank" rel="external">用预渲染加速显示iOS图片</a>。<br>（2）渲染最好时的操作之一就是混合(blending)了,所以我们不要使用透明背景，将cell的opaque值设为Yes，背景色不要使用clearColor，尽量不要使用阴影渐变等。<br>（3）由于混合操作是使用GPU来执行，我们可以用CPU来渲染，这样混合操作就不再执行。可以在UIView的drawRect方法中自定义绘制。</p>
+<p>##4. 异步UI，避免阻塞主线程<br> 很多时候我们需要从网络请求图片等，把这些操作放在后台执行，并且缓存起来。还有就是不要在主线程做一些文件的I/O操作。</p>
+<p>##5. 减少SubView的个数<br> 我们在cell上添加系统控件的时候，实际上系统都会调用底层的接口进行绘制，大量添加控件时，会消耗很大的资源并且也会影响渲染的性能。当使用默认的UITableViewCell并且在它的ContentView上面添加控件时会相当消耗性能。所以目前最佳的方法还是继承UITableViewCell，并重写drawRect方法。</p>
+<p>##6. 按需加载<br> (ノへ￣、）这块先留白，等我研究清楚再说</p>
+<p>##7. 尽量重用开销比较大的对象<br> 有些对象初始化非常慢，如NSDateFormatter 和 NSCalendar等，我们可以把它加入类的属性当中，或者创建单例来使用。</p>
+<p>##8. 不要给Cell动态添加或移除SubView<br> 最好是在初始化cell的时候就将所有需要展示的添加完毕，然后根据需要来设置hide属性显示和隐藏</p>
+<p>##9. 尽量减少计算复杂度<br> 在高分屏尽量用 ceil 或 floor 或 round 取整。不要出现 1.1，1.001这样的小数。</p>
+<p>##10. 减少多余的绘制操作<br> 在实现drawRect方法的时候，它的参数rect就是我们需要绘制的区域，在rect范围之外的区域我们不需要进行绘制，否则会消耗相当大的资源。</p>
 
--(UITableViewCell )tableView:(UITableView )tableView cellForRowAtIndexPath:(NSIndexPath )indexPath{   static NSString Identifier = @”cell”;  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: Identifier];   if (!cell) {     cell = [[UITableViewCell alloc]initWithStyl...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/10</span>
-                </div>
-            </div>
-        </article>
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+        
+            <li class="next">
+                <a href= "/2017/09/10/用预渲染加速显示iOS图片/" title= 用预渲染加速显示iOS图片 >
+                    <span>Next Post</span>
+                    <span>用预渲染加速显示iOS图片</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 来必力City版安装代码 -->
+
     
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/09/10/用预渲染加速显示iOS图片/" >
-                <div class="abstract-post-title">
-                    <h2 class="abstract-title">
-                        
-                        <span>用预渲染加速显示iOS图片</span>
-                    </h2>
-                </div>
-                <div class="abstract-content">
-                    &nbsp;&nbsp;在做UITableView性能优化的路上，一定绕不开一个点，就是渲染的问题。在使用中，我们会发现，UITableView第一次显示的图像不如再次显示的图像流畅，出现前会有稍许的停顿感。在显示图像时，解压和重采样会消耗很多CPU时间，预渲染图像，在bitmap context先将其画一遍，导出成UIImage对象，然后再绘制到屏幕，这会大大提高渲染速度。 &nbsp;&nbsp;屏幕的显示成像是结合了CPU数据处理和GPU渲染而来的，即每次垂直同步信号过来屏幕刷新时都会受到CPU和GPU的影响。CPU 计算显示内容（视图的创建、布局计算、图片解码、文本绘制等），完成...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/10</span>
-                </div>
-            </div>
-        </article>
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/08/20/写在前面/" >
-                <div class="abstract-post-title">
-                    <h2 class="abstract-title">
-                        
-                        <span>写在最前面的话</span>
-                    </h2>
-                </div>
-                <div class="abstract-content">
-                    毕业已经一年了，做为一名iOS的开发人员也已经有两年的时间，一路跌跌撞撞的在前进着，这一路上有过想放弃的冲动，有过彷徨无助，有过快乐与兴奋的成就。感谢这一路上的许多大牛对我的指导，也感谢身边有一群伙伴一路陪着我前进着！自毕业以来，整个人懒散不少，很少花大量的时间在技术研究上面，多数时候有了想法也没马上去实现，除了靠着时间积累了不少项目经验外，对自己的要求开始有所放松，很多东西开始信奉“拿来主义”，只追求功能的实现，很少去考虑为什么，还能有什么其他更好的解决办法没有,没有了刚开始学习iOS时候的热情和态度了。这段时间，对自己的过去进行总结，在几个伙伴的鼓励下，开始摒弃这种拿来主义的行为，并...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/08/20</span>
-                </div>
-            </div>
-        </article>
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/08/20/hello-world/" >
-                <div class="abstract-post-title">
-                    <h2 class="abstract-title">
-                        
-                        <span>Hello World</span>
-                    </h2>
-                </div>
-                <div class="abstract-content">
-                    Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post1$ hexo new "My New Post"
-More info: Writing
-Run server1$ hexo server
-More...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/08/20</span>
-                </div>
-            </div>
-        </article>
-    
-    <!-- paginator  -->
-    
+
+<!-- City版安装代码已完成 -->
 </main>
             <!-- profile -->
             
